@@ -1,6 +1,5 @@
 
-from functions import add, subtract, multiply
-from functions import convert_fahrenheit_to_celsius as f2c
+from fun import add, subtract, multiply
 import pytest
 
 def test_add():
