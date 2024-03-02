@@ -9,7 +9,7 @@ class MathTest(unittest.TestCase):
         self.assertEqual(10, multiply(5, 2))
 
     def test_negative_number(self):
-        self.assertEqual(1, add(-1, 2))
+        self.assertEqual(-3, add(-1, -2))
         self.assertEqual(0, subtract(-2, -2))
 
     def test_negative(self): 
