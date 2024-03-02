@@ -20,7 +20,6 @@ jobs:
           python-version: 3.x  # Specify the Python version you're using
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
 
       - name: Run unit tests
         run: python -m unittest discover
