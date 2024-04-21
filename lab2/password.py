@@ -12,11 +12,16 @@ def generate_password(length):
     return password, 0  
 
 def get_password_length():
+    if len(sys.argv) > 1:
+        try:
+            return int(sys.argv[1])
+        except ValueError:
+            pass
     try:
         length = int(input())
         return length
     except ValueError:
-        sys.stderr.write("enter a valid integer for the length of the password\n")
+        sys.stderr.write("ERROR: Enter a valid integer for the length of the password\n")
         return None
 
 def print_password(password):
@@ -25,10 +30,16 @@ def print_password(password):
 
 def main():
     length = get_password_length()
-    if length is not None:
-        password, error = generate_password(length)
-        if error == 0:  
-            print_password(password)
+    if length is None:
+        sys.exit(1) 
+
+    password, error = generate_password(length)
+    if error == 0:  
+        print_password(password)
+        sys.exit(0) 
+    else:
+        sys.exit(error)  
+ 
 
 if __name__ == "__main__":
     main()
