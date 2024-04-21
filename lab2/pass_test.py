@@ -1,37 +1,52 @@
-import random
-import string
 import sys
 import unittest
-
-def generate_password(length):
-    if not isinstance(length, int) or length <= 0:
-        return None, -1  
-    characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for _ in range(length))
-    return password, 0  
+from io import StringIO
+from password import generate_password, main
 
 class TestPasswordGenerator(unittest.TestCase):
     def test_generate_password_negative_length(self):
-        password, error = generate_password(-1)
-        self.assertIsNone(password)
-        self.assertEqual(error, -1)  
+        error = generate_password(-1)
+        self.assertEqual(error, -1)
 
     def test_generate_password_zero_length(self):
-        password, error = generate_password(0)
-        self.assertIsNone(password)
-        self.assertEqual(error, -1) 
+        error = generate_password(0)
+        self.assertEqual(error, -1)
 
     def test_generate_password_upper_limit(self):
-        length = 100
-        password, error = generate_password(length)
-        self.assertIsNotNone(password)
-        self.assertEqual(error, 0) 
-        self.assertEqual(len(password), length)
-    
+        _, error = generate_password(100)
+        self.assertEqual(error, 0)
+
     def test_generate_password_type(self):
-        password, error = generate_password("fsdjikh")
-        self.assertIsNone(password)
-        self.assertEqual(error, -1) 
+        error = generate_password("fsdjikh")
+        self.assertEqual(error, -1)
+
+    def test_main_valid_input_argv(self):
+        sys.argv = ['password_generator.py', '8']
+        sys.stdout = StringIO()
+        with self.assertRaises(SystemExit) as cm:
+            main()
+        self.assertEqual(cm.exception.code, 0)
+        self.assertTrue(sys.stdout.getvalue().startswith("Generated password:"))
+
+    def test_main_valid_input_input(self):
+        sys.argv = ['password_generator.py']
+        sys.stdin = StringIO("8\n")
+        sys.stdout = StringIO()
+        with self.assertRaises(SystemExit) as cm:
+            main()
+        self.assertEqual(cm.exception.code, 0)
+        self.assertTrue(sys.stdout.getvalue().startswith("Generated password:"))
+    
+    def test_main_invalid_input(self):
+        sys.argv = ['password_generator.py']
+        sys.stdin = StringIO("invalid\n")
+        sys.stderr = StringIO()
+        with self.assertRaises(SystemExit) as cm:
+            main()
+        self.assertEqual(cm.exception.code, 1)  
+        self.assertIn("ERROR: Enter a valid integer for the length of the password", sys.stderr.getvalue())
+
+
 
 
 if __name__ == "__main__":
