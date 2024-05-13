@@ -4,10 +4,6 @@ from typing import Any, Optional
 
 
 class Handler(ABC):
-    """
-    The Handler interface declares a method for building the chain of handlers.
-    It also declares a method for executing a request.
-    """
 
     def set_next(self, handler: Handler) -> Handler:
         pass
@@ -17,18 +13,11 @@ class Handler(ABC):
 
 
 class AbstractHandler(Handler):
-    """
-    The default chaining behavior can be implemented inside a base handler
-    class.
-    """
 
     _next_handler: Handler = None
 
     def set_next(self, handler: Handler) -> Handler:
         self._next_handler = handler
-        # Returning a handler from here will let us link handlers in a
-        # convenient way like this:
-        # builder.set_next(plumber).set_next(electrician)
         return handler
 
     def handle(self, request: Any) -> str:
@@ -36,12 +25,6 @@ class AbstractHandler(Handler):
             return self._next_handler.handle(request)
 
         return None
-
-
-"""
-All Concrete Handlers either handle a request or pass it to the next handler in
-the chain.
-"""
 
 
 class PlumberHandler(AbstractHandler):
@@ -69,10 +52,6 @@ class CarpenterHandler(AbstractHandler):
 
 
 def client_code(handler: Handler) -> None:
-    """
-    The client code is usually suited to work with a single handler. In most
-    cases, it is not even aware that the handler is part of a chain.
-    """
 
     for material in ["Pipe", "Wood", "Cement"]:
         print(f"\nClient: I need {material} for construction.")
@@ -90,8 +69,6 @@ if __name__ == "__main__":
 
     builder.set_next(electrician).set_next(carpenter)
 
-    # The client should be able to send a request to any handler, not just the
-    # first one in the chain.
     print("Chain: Plumber > Electrician > Carpenter")
     client_code(builder)
     print("\n")
