@@ -1,41 +1,45 @@
 import unittest
+from io import StringIO
+from unittest.mock import patch
 from chain import *
 
-class BuildingTest(unittest.TestCase):
-    def test_construct_building(self):
-        building = Building()
-        self.assertTrue(building.construct('construct_building'))
+class TestConstructionHandlers(unittest.TestCase):
+    def test_plumber_handler(self):
+        plumber = PlumberHandler()
+        self.assertEqual(plumber.handle("Pipe"), "Plumber: I'll install the Pipe")
+        self.assertIsNone(plumber.handle("Wire"))
 
-    def test_wrong_item(self):
-        building = Building()
-        self.assertFalse(building.construct('wrong_item'))
+    def test_electrician_handler(self):
+        electrician = ElectricianHandler()
+        self.assertEqual(electrician.handle("Wire"), "Electrician: I'll set up the Wire")
+        self.assertIsNone(electrician.handle("Pipe"))
 
-class RoofingTest(unittest.TestCase):
-    def test_add_roof(self):
-        roofing = Roofing()
-        self.assertTrue(roofing.construct('add_roof'))
+    def test_carpenter_handler(self):
+        carpenter = CarpenterHandler()
+        self.assertEqual(carpenter.handle("Wood"), "Carpenter: I'll work with the Wood")
+        self.assertIsNone(carpenter.handle("Concrete"))
 
-    def test_wrong_item(self):
-        roofing = Roofing()
-        self.assertFalse(roofing.construct('wrong_item'))
+    def test_client_code_output(self):
+        with patch('sys.stdout', new=StringIO()) as fake_stdout:
+            builder = PlumberHandler()
+            electrician = ElectricianHandler()
+            carpenter = CarpenterHandler()
 
-class InteriorDesignTest(unittest.TestCase):
-    def test_design_interior(self):
-        interior_design = InteriorDesign()
-        self.assertTrue(interior_design.construct('design_interior'))
+            builder.set_next(electrician).set_next(carpenter)
 
-    def test_wrong_item(self):
-        interior_design = InteriorDesign()
-        self.assertFalse(interior_design.construct('wrong_item'))
+            client_code(builder)
 
-class FinalTouchTest(unittest.TestCase):
-    def test_add_final_touch(self):
-        final_touch = FinalTouch()
-        self.assertTrue(final_touch.construct('add_final_touch'))
+            expected_output = (
+            "Client: I need Pipe for construction.\n"
+            "  Plumber: I'll install the Pipe\n"
+            "Client: I need Wood for construction.\n"
+            "  Carpenter: I'll work with the Wood\n"
+            "Client: I need Cement for construction.\n"
+            "  Cement was left untouched."
+        )
+        self.assertEqual(fake_stdout.getvalue().strip(), expected_output)
 
-    def test_wrong_item(self):
-        final_touch = FinalTouch()
-        self.assertFalse(final_touch.construct('wrong_item'))
+
 
 if __name__ == '__main__':
     unittest.main()
