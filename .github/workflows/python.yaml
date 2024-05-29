@@ -1,1 +1,17 @@
+name: Barboss test
 
+on:
+  push
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and push the image
+        run: |
+          docker login --username ewlas --password ${{ secrets.BarbosToken }} ghcr.io 
+          docker build ./lab4 --tag ghcr.io/ewlas/image1:latest 
+          docker push ghcr.io/ewlas/image1:latest
+      - name: Run the container
+        run: docker run ghcr.io/ewlas/image1:latest
